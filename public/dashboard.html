@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Music Dashboard</title>
+  <link rel="stylesheet" href="/dashboard.css?v=3">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .player {
+      position: fixed;
+      bottom: 20px;
+      left: 250px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(15px);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      padding: 15px 25px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 1000;
+    }
+    .delete-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      color: red;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 6px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .delete-btn:hover {
+      background: red;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="logo">
+        <i class="fas fa-headphones"></i>
+        <h1>PLAYMIXZ</h1>
+      </div>
+      <nav>
+        <ul>
+          <li class="active"><a href="#"><i class="fas fa-home"></i> Home</a></li>
+          <li><a href="#"><i class="fas fa-music"></i> Library</a></li>
+          <li><a href="#"><i class="fas fa-heart"></i> Favorites</a></li>
+         <li><a href="http://localhost:5000/playlist.html"><i class="fas fa-list"></i> Playlists</a></li>
+          <li><a href="http://localhost:5000/upload.html"><i class="fas fa-cloud-upload-alt"></i> Upload</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <header>
+        <div class="search-bar">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Search songs, artists..." id="search-input">
+        </div>
+        <div class="user-profile">
+          <span id="username-display">Welcome</span>
+          <img src="https://ui-avatars.com/api/?name=User&background=random" alt="Profile">
+        </div>
+      </header>
+
+      <div class="content">
+        <div class="section-header">
+          <h2>Recently Added</h2>
+          <div class="view-options">
+            <button id="grid-view"><i class="fas fa-th-large"></i></button>
+            <button id="list-view"><i class="fas fa-list"></i></button>
+          </div>
+        </div>
+
+        <div class="music-grid" id="recent-tracks"></div>
+
+        <h2>Your Queue</h2>
+        <div class="queue-list" id="queue"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Player -->
+  <div class="player">
+    <div class="song-info">
+      <img src="#" alt="Album Art" id="current-album-art">
+      <div>
+        <h4 id="current-song">Not Playing</h4>
+        <p id="current-artist">Select a song</p>
+      </div>
+    </div>
+    <div class="player-center">
+      <div class="player-controls">
+        <button id="shuffle-btn"><i class="fas fa-random"></i></button>
+        <button id="prev-btn"><i class="fas fa-step-backward"></i></button>
+        <button id="play-btn"><i class="fas fa-play"></i></button>
+        <button id="next-btn"><i class="fas fa-step-forward"></i></button>
+        <button id="repeat-btn"><i class="fas fa-redo"></i></button>
+      </div>
+      <div class="progress-container">
+        <span id="current-time">0:00</span>
+        <input type="range" id="progress-bar" value="0">
+        <span id="duration">0:00</span>
+      </div>
+    </div>
+    <div class="volume-control">
+      <button id="volume-btn"><i class="fas fa-volume-up"></i></button>
+      <input type="range" id="volume-bar" min="0" max="1" step="0.01" value="0.7">
+    </div>
+  </div>
+
+  <script src="/dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Upload Song - Playmizx</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #111;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .upload-box {
+      background: #222;
+      padding: 30px;
+      border-radius: 12px;
+      width: 400px;
+      box-shadow: 0 0 10px #000;
+    }
+    .upload-box h2 {
+      margin-bottom: 20px;
+      color: #0ff;
+    }
+    .upload-box input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 6px;
+    }
+    .upload-box button {
+      width: 100%;
+      padding: 12px;
+      background: #00c3ff;
+      border: none;
+      color: #000;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .upload-box button:hover {
+      background: #0ff;
+    }
+    .status {
+      margin-top: 10px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="upload-box">
+    <h2><i class="fas fa-upload"></i> Upload New Song</h2>
+    <form id="upload-form" enctype="multipart/form-data">
+      <input type="text" id="song-title" name="title" placeholder="Song Title" required />
+      <input type="text" id="song-artist" name="artist" placeholder="Artist Name" required />
+      <input type="file" id="song-cover" name="cover" accept="image/*" />
+      <input type="file" id="song-file" name="audio" accept="audio/*" required />
+      <button type="submit">Upload</button>
+    </form>
+    <div class="status" id="status"></div>
+  </div>
+
+  <script>
+    console.log("Upload page loaded");
+
+    const form = document.getElementById('upload-form');
+    const status = document.getElementById('status');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      status.textContent = 'Uploading... ⏳';
+
+      const formData = new FormData();
+      formData.append('title', document.getElementById('song-title').value);
+      formData.append('artist', document.getElementById('song-artist').value);
+      formData.append('audio', document.getElementById('song-file').files[0]);
+
+      const cover = document.getElementById('song-cover').files[0];
+      if (cover) formData.append('cover', cover);
+
+      try {
+        const res = await fetch('http://localhost:5000/api/songs', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await res.json();
+        console.log("Server response:", data);
+
+        if (res.ok) {
+          status.innerHTML = '✅ Song uploaded successfully!';
+          form.reset();
+        } else {
+          status.innerHTML = `❌ Upload failed: ${data.error}`;
+        }
+
+      } catch (err) {
+        console.error(err);
+        status.textContent = '❌ Error uploading song';
+      }
+    });
+  </script>
+</body>
+</html>

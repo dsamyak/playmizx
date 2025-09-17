@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up - Playmixz</title>
+  <link rel="stylesheet" href="login.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <div class="login-container">
+    <div class="logo">
+      <i class="fas fa-headphones"></i>
+      <h1>PLAYMIXZ</h1>
+    </div>
+    
+    <form id="signupForm">
+      <div class="input-group">
+        <i class="fas fa-user"></i>
+        <input type="text" id="username" placeholder="Choose username" required>
+      </div>
+      
+      <div class="input-group">
+        <i class="fas fa-lock"></i>
+        <input type="password" id="password" placeholder="Choose password" required>
+      </div>
+
+      <button type="submit">Sign Up</button>
+      
+      <div class="links">
+        <a href="login.html">Already have an account? Login</a>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('signupForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      
+      try {
+        const response = await fetch('http://localhost:5000/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.error || 'Signup failed');
+        }
+
+        alert('Account created successfully! Please login.');
+        window.location.href = 'login.html';
+        
+      } catch (error) {
+        alert(error.message);
+        console.error('Signup error:', error);
+      }
+    });
+  </script>
+</body>
+</html>

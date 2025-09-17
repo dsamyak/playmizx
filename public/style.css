@@ -1,0 +1,77 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(90deg, #00c3ff, #fc00ff);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .navbar {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: linear-gradient(90deg, #0af, #a0f);
+    border-radius: 30px;
+    padding: 10px 20px;
+    margin: 20px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    width: 90%;
+    max-width: 700px;
+  }
+  
+  .navbar i {
+    font-size: 20px;
+    color: white;
+    padding: 10px;
+    transition: 0.3s;
+    cursor: pointer;
+  }
+  
+  .navbar i:hover {
+    transform: scale(1.2);
+    color: #fff176;
+  }
+  
+  .main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .main h1 {
+    font-size: 48px;
+    font-weight: bold;
+    letter-spacing: 4px;
+    color: #ffffff;
+    opacity: 0;
+    animation: welcomeFadeZoom 2s ease-in-out forwards, colorShift 5s infinite alternate;
+  }
+  
+  /* Fade-in + Zoom Animation */
+  @keyframes welcomeFadeZoom {
+    0% {
+      opacity: 0;
+      transform: scale(0.5);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  /* Color Shifting Animation */
+  @keyframes colorShift {
+    0% {
+      color: #ffffff;
+    }
+    50% {
+      color: #00ffcc;
+    }
+    100% {
+      color: #ffccff;
+    }
+  }
+  

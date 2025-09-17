@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>All Playlists | Playmixz</title>
+  <link rel="stylesheet" href="/playlist.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+ 
+
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #00c3ff, #fc00ff);
+      color: white;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .playlist-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .playlist-card {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+    .playlist-name {
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .playlist-actions {
+      display: flex;
+      gap: 10px;
+    }
+    .playlist-actions button {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      background: #00c3ff;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .playlist-actions button:hover {
+      background: #fc00ff;
+      color: white;
+    }
+
+    #new-playlist-form {
+      display: flex;
+      justify-content: center;
+      margin-top: 30px;
+      gap: 10px;
+    }
+
+    #new-playlist-form input {
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      width: 250px;
+    }
+
+    #new-playlist-form button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      background: #00c3ff;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🎵 Your Playlists</h1>
+
+<div class="playlist-container" id="playlist-list">
+  <p>Loading playlists...</p>
+</div>
+
+<form id="new-playlist-form">
+  <input type="text" id="playlist-name" placeholder="New Playlist Name" required />
+  <button type="submit">Create</button>
+</form>
+<!-- playlist.html -->
+<h1 id="playlist-title"></h1>
+<p id="song-count"></p>
+<div class="playlist-actions">
+  <button onclick="shufflePlaylist()">Shuffle</button>
+  <button onclick="copyPlaylistLink()">Share</button>
+</div>
+<div id="songs-grid"></div>
+
+<script>
+  const listEl = document.getElementById('playlist-list');
+
+  async function loadPlaylists() {
+    try {
+      const res = await fetch('http://localhost:5000/api/playlists');
+      const playlists = await res.json();
+
+      listEl.innerHTML = '';
+
+      playlists.forEach(pl => {
+        const card = document.createElement('div');
+        card.className = 'playlist-card';
+        card.innerHTML = `
+          <span class="playlist-name">${pl.name}</span>
+          <div class="playlist-actions">
+            <button onclick="window.location.href='playlist.html?id=${pl._id}'">View</button>
+            <button onclick="copyLink('${pl._id}')">Share</button>
+            <button onclick="deletePlaylist('${pl._id}')">Delete</button>
+          </div>
+        `;
+        listEl.appendChild(card);
+      });
+    } catch (err) {
+      listEl.innerHTML = '<p style="color:red">Failed to load playlists</p>';
+    }
+  }
+
+  async function deletePlaylist(id) {
+    if (!confirm("Delete this playlist?")) return;
+    await fetch(`http://localhost:5000/api/playlists/${id}`, { method: 'DELETE' });
+    loadPlaylists();
+  }
+
+  function copyLink(id) {
+    const url = `http://localhost:5000/playlist.html?id=${id}`;
+    navigator.clipboard.writeText(url);
+    alert("Playlist link copied!");
+  }
+
+  document.getElementById('new-playlist-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const name = document.getElementById('playlist-name').value;
+    try {
+      await fetch('http://localhost:5000/api/playlists', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name })
+      });
+      document.getElementById('playlist-name').value = '';
+      loadPlaylists();
+    } catch (err) {
+      alert('Failed to create playlist');
+    }
+  });
+
+  window.addEventListener('DOMContentLoaded', loadPlaylists);
+
+  let playlist = null;
+let audio = new Audio();
+const playlistId = new URLSearchParams(window.location.search).get("id");
+
+async function loadPlaylist() {
+  const res = await fetch(`http://localhost:5000/api/playlists/${playlistId}`);
+  playlist = await res.json();
+
+  document.getElementById("playlist-title").textContent = playlist.name;
+  document.getElementById("song-count").textContent = `${playlist.songs.length} song(s)`;
+  
+  const grid = document.getElementById("songs-grid");
+  grid.innerHTML = '';
+
+  playlist.songs.forEach(song => {
+    const card = document.createElement('div');
+    card.className = 'song-card';
+    card.innerHTML = `
+      <img src="http://localhost:5000${song.cover}" />
+      <div class="overlay" data-url="${song.url}"><i class="fas fa-play"></i></div>
+      <h4>${song.title}</h4>
+      <p>${song.artist}</p>
+      <button onclick="removeFromPlaylist('${song._id}')">Remove</button>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+document.addEventListener('click', (e) => {
+  const overlay = e.target.closest('.overlay');
+  if (!overlay) return;
+  audio.src = `http://localhost:5000${overlay.dataset.url}`;
+  audio.play();
+});
+
+async function removeFromPlaylist(songId) {
+  await fetch(`http://localhost:5000/api/playlists/${playlistId}/remove`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ songId })
+  });
+  loadPlaylist();
+}
+
+function shufflePlaylist() {
+  playlist.songs = playlist.songs.sort(() => 0.5 - Math.random());
+  loadPlaylist();
+}
+
+function copyPlaylistLink() {
+  const link = `${window.location.origin}/playlist.html?id=${playlistId}`;
+  navigator.clipboard.writeText(link);
+  alert("Playlist link copied!");
+}
+
+window.addEventListener("DOMContentLoaded", loadPlaylist);
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Music App - Login</title>
+  <link rel="stylesheet" href="login.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <div class="login-container">
+    <div class="logo">
+      <i class="fas fa-headphones"></i>
+      <h1>PLAYMIXZ</h1>
+    </div>
+    
+    <form id="loginForm">
+      <div class="input-group">
+        <i class="fas fa-user"></i>
+        <input type="text" id="username" placeholder="Username" required>
+      </div>
+      
+      <div class="input-group">
+        <i class="fas fa-lock"></i>
+        <input type="password" id="password" placeholder="Password" required>
+      </div>
+      
+      <button type="submit">Login</button>
+      
+      <div class="links">
+        <a href="#" id="registerLink">Create account</a>
+        <a href="#">Forgot password?</a>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:5000/api/auth';
+
+    // LOGIN handler
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      
+      try {
+        const response = await fetch(`${API_BASE}/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.error || 'Login failed');
+        }
+
+        // Save JWT and user info
+        localStorage.setItem('musicToken', data.token);
+        localStorage.setItem('musicUser', JSON.stringify(data.user));
+
+        // Redirect to dashboard
+        window.location.href = 'dashboard.html';
+        
+      } catch (error) {
+        alert(error.message);
+        console.error('Login error:', error);
+      }
+    });
+
+    // REGISTER handler
+    document.getElementById('registerLink').addEventListener('click', async (e) => {
+      e.preventDefault();
+      const username = prompt('Enter username:');
+      const password = prompt('Enter password (min 6 chars):');
+      
+      if (username && password) {
+        try {
+          const response = await fetch(`${API_BASE}/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+          });
+          
+          const data = await response.json();
+          
+          if (!response.ok) throw new Error(data.error || 'Registration failed');
+          alert('Registration successful! Now login.');
+        } catch (error) {
+          alert('Registration failed: ' + error.message);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
